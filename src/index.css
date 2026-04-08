@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #0460D9;
+  --secondary: #002855;
+  --bg-app: #F1F3F5;
+}
+
+body {
+  font-family: 'Inter', 'Outfit', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-app);
+  color: #1E293B;
+  font-size: 13px;
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-none font-bold uppercase text-[11px] tracking-widest transition-all duration-300 active:scale-95 disabled:opacity-50 inline-flex items-center justify-center gap-2;
+  }
+  .btn-primary {
+    @apply bg-[#0460D9] text-white hover:bg-[#002855] shadow-sm;
+  }
+  .btn-outline {
+    @apply border border-[#E2E8F0] bg-white text-slate-600 hover:bg-slate-50;
+  }
+  .card {
+    @apply bg-white rounded-none border border-[#E2E8F0] shadow-premium overflow-hidden;
+  }
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-none border border-[#E2E8F0] bg-slate-50 focus:outline-none focus:ring-1 focus:ring-[#0460D9] focus:border-[#0460D9] focus:bg-white transition-all text-sm;
+  }
+  
+  .title-premium {
+    @apply text-2xl font-black text-[#0460D9] tracking-tight;
+  }
+  
+  .subtitle-premium {
+    @apply text-[10px] text-slate-500 font-black uppercase tracking-[0.1em] mt-0.5;
+  }
+}

@@ -1,0 +1,145 @@
+Quiero que construyas una aplicación web tipo SPA (Single Page Application) para la gestión de PQRSF (Peticiones, Quejas, Reclamos, Sugerencias y Felicitaciones) como una app satélite externa que se integra con un sistema principal llamado “SGE - Sistema de Gestión Educativa”.
+
+OBJETIVO ARQUITECTÓNICO
+
+La aplicación PQRSF debe ser un cliente desacoplado que consuma la API del sistema principal (SGE), sin tener acceso directo a la base de datos.
+
+Debe cumplir con:
+
+Arquitectura desacoplada (cliente de API)
+Consumo exclusivo de endpoints REST (/api/v1/)
+No duplicar lógica de negocio ni datos
+Escalable para futuras integraciones (móvil, otros portales)
+
+CONTEXTO DEL SISTEMA PRINCIPAL (SGE)
+
+Backend: Django + Django REST Framework
+Base de datos: PostgreSQL
+API centralizada: /api/v1/
+Autenticación: Microsoft Entra ID (Azure AD) y/o sistema interno
+Seguridad: API Keys con scopes (basico, salud, financiero, etc.)
+Documentación: Swagger
+Integraciones: SharePoint (gestión documental)
+
+El SGE ya gestiona:
+
+Usuarios (estudiantes, empleados, administrativos)
+Dependencias
+Información académica y administrativa
+
+ARQUITECTURA DE LA APP PQRSF
+
+La app debe ser:
+
+Frontend:
+
+Vite
+JavaScript o React
+Tailwind CSS
+Arquitectura modular por dominios
+
+Backend:
+
+No crear backend propio inicialmente
+Consumir directamente la API del SGE
+
+ESTRUCTURA DEL FRONTEND
+
+src/
+modules/
+pqrsf/
+pages/
+components/
+services/
+hooks/
+store/
+
+CONSUMO DE API
+
+La aplicación debe consumir endpoints como:
+
+POST /api/v1/pqrsf/solicitudes/
+GET /api/v1/pqrsf/solicitudes/
+GET /api/v1/pqrsf/solicitudes/{id}/
+PATCH /api/v1/pqrsf/solicitudes/{id}/estado/
+GET /api/v1/pqrsf/dashboard/
+
+También endpoints del core:
+
+GET /api/v1/usuarios/
+GET /api/v1/dependencias/
+
+AUTENTICACIÓN
+
+La app debe soportar:
+
+Login mediante Microsoft Entra ID (si aplica)
+Uso de tokens JWT o API Keys según el tipo de usuario
+Manejo de sesiones en frontend
+
+ROLES Y ACCESO
+
+La aplicación debe manejar roles:
+
+Usuario (crea solicitudes)
+Dependencia (gestiona solicitudes)
+Administrador
+
+Cada rol debe ver únicamente la información que le corresponde.
+
+FUNCIONALIDADES PRINCIPALES
+
+Para usuarios:
+
+Crear solicitud PQRSF
+Adjuntar archivos
+Consultar estado
+Ver historial
+
+Para dependencias:
+
+Ver solicitudes asignadas
+Filtrar por estado, tipo y periodo
+Responder solicitudes
+Cambiar estado
+
+Para administradores:
+
+Dashboard con métricas
+Reportes
+Seguimiento de tiempos de respuesta
+
+UI/UX
+
+Diseño moderno tipo SaaS
+Responsive (móvil y escritorio)
+Dashboard con gráficas (Chart.js o Recharts)
+Uso de Tailwind CSS
+
+REGLAS IMPORTANTES
+
+No acceder directamente a base de datos
+No duplicar lógica del backend
+Toda interacción debe hacerse vía API
+Manejo de errores de API (status codes)
+Implementar loading states y feedback visual
+
+EXTRAS
+
+Filtros avanzados (estado, tipo, periodo)
+Paginación
+Exportación a Excel/PDF (si API lo permite)
+Manejo de logs en frontend
+Preparado para internacionalización
+
+ENTREGABLES
+
+Estructura completa del frontend
+Servicios de consumo de API
+Componentes principales
+Páginas (crear, listar, dashboard)
+Manejo de autenticación
+Ejemplo de integración con endpoints reales
+Arquitectura del proyecto explicada
+
+Genera el proyecto siguiendo buenas prácticas, código limpio y arquitectura modular.
