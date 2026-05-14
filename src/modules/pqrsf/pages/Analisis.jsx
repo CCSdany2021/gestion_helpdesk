@@ -487,12 +487,12 @@ const KPIItem = ({ title, value, subtitle, icon, bgColor, colorClass, isText }) 
       <div className={`p-3 ${bgColor} rounded-lg shadow-inner`}>
         {React.cloneElement(icon, { size: 22 })}
       </div>
-      <span className="text-[10px] font-bold text-slate-400 capitalize bg-slate-50 px-2 py-0.5 rounded-full border border-slate-100">Live</span>
+      <span className="text-xs font-medium text-slate-400 capitalize bg-slate-50 px-2 py-1 rounded-full border border-slate-100">Live</span>
     </div>
     <div className="relative z-10">
-       <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{title}</p>
-       <p className={`${isText ? 'text-lg overflow-hidden text-ellipsis whitespace-nowrap' : 'text-3xl'} font-black mb-1 ${colorClass}`}>{value}</p>
-       <p className="text-[11px] font-semibold text-slate-400 bg-slate-50 inline-block px-2 py-0.5 rounded-full">{subtitle}</p>
+       <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
+       <p className={`${isText ? 'text-lg overflow-hidden text-ellipsis whitespace-nowrap' : 'text-3xl'} font-bold mb-1 ${colorClass}`}>{value}</p>
+       <p className="text-sm font-medium text-slate-400 bg-slate-50 inline-block px-2 py-1 rounded-full">{subtitle}</p>
     </div>
   </Card>
 )

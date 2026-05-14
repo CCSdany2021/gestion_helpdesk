@@ -1,23 +1,52 @@
 import React, { useState } from 'react'
-import { Card, Badge, Button, cn } from '@/components/ui'
+import { Card, Badge, Button, Avatar } from '@/components/ui'
 import { 
   Search, 
   Filter, 
   Download, 
-  Users,
-  MessageSquare,
-  FileText,
-  RotateCcw,
   ChevronRight,
-  UserCircle,
-  History,
-  AlertCircle
+  Clock,
+  CheckCircle,
+  FileText,
+  Calendar,
+  Building2
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { generateFullData } from '../services/mockData'
 
-const mockFullAdmin = generateFullData()
+const mockData = generateFullData()
+
+const StatusBadge = ({ status }) => {
+  const config = {
+    'En Proceso': { icon: Clock, bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100' },
+    'Atendido': { icon: CheckCircle, bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100' },
+  }
+  
+  const { icon: Icon, bg, text, border } = config[status] || config['En Proceso']
+  
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border ${bg} ${text} ${border}`}>
+      <Icon size={12} />
+      {status}
+    </span>
+  )
+}
+
+const TypeBadge = ({ type }) => {
+  const colors = {
+    'Petición': 'bg-indigo-50 text-indigo-700 border-indigo-100',
+    'Queja': 'bg-amber-50 text-amber-700 border-amber-100',
+    'Reclamo': 'bg-red-50 text-red-700 border-red-100',
+    'Sugerencia': 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  }
+  
+  return (
+    <span className={`px-2 py-0.5 rounded text-xs font-medium border ${colors[type] || colors['Petición']}`}>
+      {type}
+    </span>
+  )
+}
 
 const HistorialSolicitudes = () => {
   const [activeTab, setActiveTab] = useState('TODOS')
@@ -27,12 +56,12 @@ const HistorialSolicitudes = () => {
   const navigate = useNavigate()
 
   const tabs = [
-    { label: 'TODOS', count: mockFullAdmin.length },
-    { label: 'EN PROCESO', count: mockFullAdmin.filter(i => i.estado === 'En Proceso').length },
-    { label: 'ATENDIDOS', count: mockFullAdmin.filter(i => i.estado === 'Atendido').length },
+    { label: 'TODOS', count: mockData.length },
+    { label: 'EN PROCESO', count: mockData.filter(i => i.estado === 'En Proceso').length },
+    { label: 'ATENDIDOS', count: mockData.filter(i => i.estado === 'Atendido').length },
   ]
 
-  const filteredData = mockFullAdmin.filter(item => {
+  const filteredData = mockData.filter(item => {
     const matchesTab = activeTab === 'TODOS' || 
                       (activeTab === 'EN PROCESO' && item.estado === 'En Proceso') ||
                       (activeTab === 'ATENDIDOS' && item.estado === 'Atendido')
@@ -44,120 +73,172 @@ const HistorialSolicitudes = () => {
     return matchesTab && matchesSearch
   })
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredData.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage)
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
-
   return (
-    <div className="space-y-6 pt-2">
-      <Card className="rounded-none border-none shadow-sm p-1 bg-white">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-          <div className="flex items-center overflow-x-auto scrollbar-hide">
+    <div className="space-y-6">
+      {/* Header Card */}
+      <Card className="p-1">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-4">
+          {/* Tabs */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
             {tabs.map((tab) => (
               <button
                 key={tab.label}
                 onClick={() => { setActiveTab(tab.label); setCurrentPage(1); }}
-                className={cn(
-                  "px-6 py-4 flex items-center gap-2 border-b-2 text-[10px] font-black transition-all",
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                   activeTab === tab.label 
-                    ? "border-[#0460D9] text-[#0460D9]" 
-                    : "border-transparent text-slate-400 hover:text-slate-600"
-                )}
+                    ? "bg-white text-indigo-600 shadow-sm" 
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
               >
                 {tab.label}
-                <span className={cn(
-                  "h-5 w-7 flex items-center justify-center rounded-none text-[9px] font-bold",
-                  activeTab === tab.label ? "bg-[#0460D9] text-white" : "bg-slate-50 text-slate-400"
-                )}>
+                <span className={`px-2 py-0.5 rounded-full text-xs ${
+                  activeTab === tab.label ? "bg-indigo-100 text-indigo-600" : "bg-slate-200 text-slate-500"
+                }`}>
                   {tab.count}
                 </span>
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-4 px-4 py-2 w-full lg:w-auto">
-             <div className="relative flex-1 lg:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                <input 
-                  type="text"
-                  placeholder="FILTRAR HISTORIAL TOTAL..."
-                  className="w-full pl-10 pr-4 py-3 bg-[#F8FAFC] text-[10px] font-black uppercase tracking-widest border-none outline-none focus:ring-1 focus:ring-[#0460D9]/20 font-bold"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-             </div>
+
+          {/* Search */}
+          <div className="flex items-center gap-3 w-full lg:w-auto">
+            <div className="relative flex-1 lg:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <input 
+                type="text"
+                placeholder="Buscar por radicado o asunto..."
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" size="md">
+              <Filter size={18} />
+              Filtros
+            </Button>
           </div>
         </div>
       </Card>
 
-      <Card className="rounded-none border-none shadow-premium overflow-x-auto bg-white p-8">
-        <table className="w-full text-left border-collapse min-w-[1000px]">
-          <thead>
-            <tr className="border-b border-slate-100 italic">
-              <th className="pb-8 text-[11px] font-black uppercase tracking-[0.15em] text-[#64748B]">Radicado Folio</th>
-              <th className="pb-8 text-[11px] font-black uppercase tracking-[0.15em] text-[#64748B] text-center px-4">Estado Actual</th>
-              <th className="pb-8 text-[11px] font-black uppercase tracking-[0.15em] text-[#64748B] px-4">Asunto del Ciudadano</th>
-              <th className="pb-8 text-[11px] font-black uppercase tracking-[0.15em] text-[#64748B] text-center px-4">Área Responsable</th>
-              <th className="pb-8 text-[11px] font-black uppercase tracking-[0.15em] text-[#64748B] text-center px-4 whitespace-nowrap">Fecha Suministrada</th>
-              <th className="pb-8 text-[11px] font-black uppercase tracking-[0.15em] text-[#002855] text-right">Trazabilidad</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-50">
-            {paginatedData.map((item) => (
-              <tr key={item.id} className="group hover:bg-slate-50/50 transition-colors cursor-pointer" onClick={() => navigate(`/pqrsf/detalle/${item.id}`)}>
-                <td className="py-8">
-                  <p className="text-[12px] font-black text-[#0460D9] leading-none group-hover:underline uppercase">#{item.id}</p>
-                  <p className="text-[8px] font-bold text-slate-300 uppercase mt-2 tracking-widest">SGE · CALASANZ</p>
-                </td>
-                <td className="py-8 text-center px-4 whitespace-nowrap">
-                   <div className={cn(
-                     "inline-flex items-center gap-2 px-4 py-1.5 text-[9px] font-black uppercase border",
-                     item.estado === 'Atendido' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100"
-                   )}>
-                     <div className={cn("h-1.5 w-1.5", item.estado === 'Atendido' ? "bg-emerald-500" : "bg-amber-500")}></div>
-                     {item.estado.toUpperCase()}
-                   </div>
-                </td>
-                <td className="py-8 px-4 flex flex-col pt-10">
-                   <p className="text-[11px] font-bold text-slate-700 uppercase tracking-tight truncate max-w-[280px]">{item.asunto}</p>
-                   <p className="text-[9px] text-slate-400 mt-1 font-bold italic uppercase">{item.tipo} INSTITUCIONAL</p>
-                </td>
-                <td className="py-8 text-center px-4">
-                   <span className="px-4 py-2 bg-slate-50 text-slate-600 text-[10px] font-black uppercase border border-slate-100/50 italic">
-                     {item.dependencia.toUpperCase()}
-                   </span>
-                </td>
-                <td className="py-8 text-center text-[10px] font-bold text-slate-500 uppercase">{item.fecha}</td>
-                <td className="py-8 text-right px-4">
-                   <button className="h-10 px-6 bg-[#0460D9] text-white text-[10px] font-black uppercase tracking-widest hover:bg-[#002855] transition-all rounded-[5px]">
-                     VER DETALLE
-                   </button>
-                </td>
+      {/* Table Card */}
+      <Card className="overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-slate-50 border-b border-slate-100">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Radicado</th>
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Estado</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Asunto</th>
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Dependencia</th>
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Fecha</th>
+                <th className="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Detalle</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {paginatedData.map((item) => (
+                <motion.tr 
+                  key={item.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                  onClick={() => navigate(`/pqrsf/detalle/${item.id}`)}
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                        <FileText size={18} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-indigo-600">#{item.id}</p>
+                        <p className="text-xs text-slate-400">SGE · Calasanz</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <StatusBadge status={item.estado} />
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <TypeBadge type={item.tipo} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-700 truncate max-w-[250px]">{item.asunto}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="inline-flex items-center gap-1.5 text-sm text-slate-600">
+                      <Building2 size={14} />
+                      {item.dependencia}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="text-sm text-slate-500 flex items-center justify-center gap-1">
+                      <Calendar size={14} />
+                      {item.fecha}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <Button 
+                      variant="primary" 
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/pqrsf/detalle/${item.id}`)
+                      }}
+                    >
+                      Ver
+                      <ChevronRight size={16} />
+                    </Button>
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      <div className="flex items-center justify-between px-2 pb-12">
-         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Auditoría Privada del Sistema • Calasanz Suba 2026</p>
-         <div className="flex gap-2">
-            <button onClick={() => setCurrentPage(p => Math.max(1, p-1))} disabled={currentPage === 1} className="p-2 border border-slate-200 text-slate-200 self-center">
+        {/* Pagination */}
+        <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+          <p className="text-sm text-slate-500">
+            Mostrando {startIndex + 1} - {Math.min(startIndex + itemsPerPage, filteredData.length)} de {filteredData.length}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(p => Math.max(1, p-1))}
+            >
               <ChevronRight size={16} className="rotate-180" />
-            </button>
-            <button className="h-8 w-8 bg-[#0460D9] text-white text-[10px] font-black">{currentPage}</button>
-            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))} disabled={currentPage === totalPages} className="p-2 border border-slate-200 text-slate-300 self-center">
+            </Button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const page = i + 1
+              return (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? 'primary' : 'ghost'}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                  className="w-8"
+                >
+                  {page}
+                </Button>
+              )
+            })}
+            <Button 
+              variant="outline" 
+              size="sm"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p+1))}
+            >
               <ChevronRight size={16} />
-            </button>
-         </div>
-      </div>
+            </Button>
+          </div>
+        </div>
+      </Card>
     </div>
   )
 }

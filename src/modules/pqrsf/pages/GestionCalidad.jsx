@@ -1,34 +1,44 @@
 import React, { useState } from 'react'
-import { Card, Badge, Button, Input, cn } from '@/components/ui'
+import { Card, Badge, Button, Avatar } from '@/components/ui'
 import { 
   Search, 
   Filter, 
-  Download, 
-  ExternalLink, 
-  Calendar,
-  Users,
-  Grid,
   ClipboardCheck,
   Clock,
-  Eye,
+  CheckCircle,
   MessageSquare,
-  FileText,
-  RotateCcw,
-  ChevronRight,
   ShieldCheck,
-  UserCircle
+  ChevronRight,
+  FileText,
+  Calendar,
+  Building2,
+  User
 } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
 import { generateFullData } from '../services/mockData'
 
 const mockPQRSF = generateFullData()
+
+const StatusBadge = ({ status }) => {
+  const config = {
+    'En Proceso': { icon: Clock, bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-100' },
+    'Atendido': { icon: CheckCircle, bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-100' },
+  }
+  
+  const { icon: Icon, bg, text, border } = config[status] || config['En Proceso']
+  
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${bg} ${text} ${border}`}>
+      <Icon size={12} />
+      {status}
+    </span>
+  )
+}
 
 const GestionCalidad = () => {
   const [activeTab, setActiveTab] = useState('TODOS')
   const [search, setSearch] = useState('')
   const [selectedTicket, setSelectedTicket] = useState(null)
-  const navigate = useNavigate()
 
   const tabs = [
     { label: 'TODOS', count: mockPQRSF.length },
@@ -49,171 +59,197 @@ const GestionCalidad = () => {
   })
 
   return (
-    <div className="space-y-6 pt-2 pb-2">
-      {/* Stats Quick Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6 bg-white border-l-4 border-[#0460D9]">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Radicados</p>
-          <p className="text-3xl font-black text-[#002855] mt-2">{mockPQRSF.length}</p>
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="p-5 hover:shadow-md transition-shadow" style={{ borderTop: '4px solid #6366F1' }}>
+          <p className="text-sm font-medium text-slate-500">Total Radicados</p>
+          <p className="text-3xl font-bold text-slate-800 mt-1">{mockPQRSF.length}</p>
         </Card>
-        <Card className="p-6 bg-white border-l-4 border-emerald-500">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Atendidos</p>
-          <p className="text-3xl font-black text-[#002855] mt-2">{mockPQRSF.filter(i => i.estado === 'Atendido').length}</p>
+        <Card className="p-5 hover:shadow-md transition-shadow" style={{ borderTop: '4px solid #10B981' }}>
+          <p className="text-sm font-medium text-slate-500">Atendidos</p>
+          <p className="text-3xl font-bold text-slate-800 mt-1">{mockPQRSF.filter(i => i.estado === 'Atendido').length}</p>
         </Card>
-        <Card className="p-6 bg-white border-l-4 border-amber-500">
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">En Proceso</p>
-          <p className="text-3xl font-black text-[#002855] mt-2">{mockPQRSF.filter(i => i.estado === 'En Proceso').length}</p>
+        <Card className="p-5 hover:shadow-md transition-shadow" style={{ borderTop: '4px solid #F59E0B' }}>
+          <p className="text-sm font-medium text-slate-500">En Proceso</p>
+          <p className="text-3xl font-bold text-slate-800 mt-1">{mockPQRSF.filter(i => i.estado === 'En Proceso').length}</p>
         </Card>
       </div>
 
-      <Card className="rounded-none border-none shadow-sm p-1 bg-white">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-          <div className="flex items-center overflow-x-auto scrollbar-hide">
+      {/* Header Card */}
+      <Card className="p-1">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-4 p-4">
+          {/* Tabs */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
             {tabs.map((tab) => (
               <button
                 key={tab.label}
                 onClick={() => { setActiveTab(tab.label); setSelectedTicket(null); }}
-                className={cn(
-                  "px-6 py-4 flex items-center gap-2 border-b-2 text-[10px] font-black transition-all",
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                   activeTab === tab.label 
-                    ? "border-[#0460D9] text-[#0460D9]" 
-                    : "border-transparent text-slate-400 hover:text-slate-600"
-                )}
+                    ? "bg-white text-indigo-600 shadow-sm" 
+                    : "text-slate-500 hover:text-slate-700"
+                }`}
               >
                 {tab.label}
-                <span className={cn(
-                  "h-5 w-7 flex items-center justify-center rounded-none text-[9px] font-bold",
-                  activeTab === tab.label ? "bg-[#0460D9] text-white" : "bg-slate-50 text-slate-400"
-                )}>
+                <span className={`px-2 py-0.5 rounded-full text-xs ${
+                  activeTab === tab.label ? "bg-indigo-100 text-indigo-600" : "bg-slate-200 text-slate-500"
+                }`}>
                   {tab.count}
                 </span>
               </button>
             ))}
           </div>
 
-          <div className="flex items-center gap-4 px-4 py-2 w-full lg:w-auto">
-             <div className="relative flex-1 lg:w-64">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                <input 
-                  type="text"
-                  placeholder="FILTRAR POR USUARIO O ID..."
-                  className="w-full pl-10 pr-4 py-3 bg-[#F8FAFC] text-[10px] font-black uppercase tracking-widest border-none focus:ring-1 focus:ring-[#0460D9]/20 font-bold outline-none"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-             </div>
+          {/* Search */}
+          <div className="relative flex-1 lg:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input 
+              type="text"
+              placeholder="Buscar por usuario o ID..."
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
         </div>
       </Card>
 
-      {/* Trazabilidad Master-Detail View */}
-      <div className="flex bg-white h-[calc(100vh-230px)] min-h-[600px] border border-slate-100 shadow-premium overflow-hidden mt-6 rounded-[5px]">
-        
-        {/* Left Panel (Master) */}
-        <div className="w-1/3 md:w-[350px] border-r border-slate-100 flex flex-col bg-slate-50 flex-shrink-0">
-            <div className="p-4 border-b border-slate-200 bg-white grid grid-cols-2 gap-2 text-center text-[9px] font-black uppercase tracking-widest text-slate-400">
-               <div>TICKET</div>
-               <div>ESTADO</div>
+      {/* Master-Detail View */}
+      <Card className="overflow-hidden" style={{ minHeight: '500px' }}>
+        <div className="flex flex-col md:flex-row">
+          {/* Left Panel (List) */}
+          <div className="w-full md:w-[350px] border-b md:border-b-0 md:border-r border-slate-100 flex flex-col flex-shrink-0">
+            <div className="p-4 border-b border-slate-100 bg-slate-50">
+              <div className="grid grid-cols-2 gap-2 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <div>Ticket</div>
+                <div>Estado</div>
+              </div>
             </div>
             
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
-               {filteredData.map(item => (
-                  <div 
-                     key={item.id}
-                     onClick={() => setSelectedTicket(item)}
-                     className={`p-5 border-b border-slate-100 cursor-pointer transition-all ${selectedTicket?.id === item.id ? 'bg-[#0460D9]/5 border-l-4 border-[#0460D9]' : 'hover:bg-slate-100 border-l-4 border-transparent bg-white'}`}
-                  >
-                     <div className="flex justify-between items-start mb-2">
-                        <p className={`text-[11px] font-black uppercase tracking-tight leading-tight flex-1 pr-2 truncate ${selectedTicket?.id === item.id ? 'text-[#0460D9]' : 'text-[#002855]'}`}>{item.solicitante}</p>
-                        <div className={`w-2 h-2 rounded-full mt-1 flex-shrink-0 shadow-sm ${item.estado==='Atendido'?'bg-emerald-500':'bg-amber-500'}`} />
-                     </div>
-                     <p className="text-[10px] text-slate-500 font-bold truncate mb-3">{item.asunto}</p>
-                     <div className="flex justify-between items-center text-[9px] text-slate-400 font-bold tracking-widest uppercase">
-                        <span>ID: {item.id}</span>
-                        <span>{item.fecha}</span>
-                     </div>
+            <div className="flex-1 overflow-y-auto">
+              {filteredData.map(item => (
+                <motion.div 
+                  key={item.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  onClick={() => setSelectedTicket(item)}
+                  className={`p-4 border-b border-slate-100 cursor-pointer transition-all hover:bg-slate-50 ${
+                    selectedTicket?.id === item.id ? 'bg-indigo-50 border-l-4 border-l-indigo-500' : 'border-l-4 border-l-transparent'
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <p className={`text-sm font-semibold truncate flex-1 pr-2 ${
+                      selectedTicket?.id === item.id ? 'text-indigo-600' : 'text-slate-800'
+                    }`}>{item.solicitante}</p>
+                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
+                      item.estado === 'Atendido' ? 'bg-emerald-500' : 'bg-amber-500'
+                    }`} />
                   </div>
-               ))}
-               {filteredData.length === 0 && (
-                  <div className="p-8 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                     No hay tickets
+                  <p className="text-xs text-slate-500 truncate mb-2">{item.asunto}</p>
+                  <div className="flex justify-between items-center text-xs text-slate-400">
+                    <span>ID: {item.id}</span>
+                    <span>{item.fecha}</span>
                   </div>
-               )}
+                </motion.div>
+              ))}
+              {filteredData.length === 0 && (
+                <div className="p-8 text-center text-sm text-slate-400">
+                  No hay tickets
+                </div>
+              )}
             </div>
-        </div>
+          </div>
 
-        {/* Right Panel (Detail) */}
-        <div className="flex-1 flex flex-col bg-white overflow-y-auto custom-scrollbar relative p-8 md:p-12">
-           {selectedTicket ? (
+          {/* Right Panel (Detail) */}
+          <div className="flex-1 flex flex-col overflow-y-auto p-6 md:p-8">
+            {selectedTicket ? (
               <div className="max-w-3xl">
-                  {/* Cabecera del Ticket */}
-                  <div className="mb-10 pb-6 border-b border-slate-100">
-                     <div className="flex items-start justify-between gap-4 mb-4">
-                        <h2 className="text-2xl font-black text-[#002855] text-balance leading-tight">{selectedTicket.asunto}</h2>
-                        <div className={`px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border border-dashed rounded-[3px] flex-shrink-0 ${selectedTicket.estado==='Atendido' ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-amber-50 text-amber-600 border-amber-200'}`}>
-                           {selectedTicket.estado}
-                        </div>
-                     </div>
-                     <p className="text-[10px] uppercase tracking-widest text-[#64748B] font-bold">
-                        Creado por <span className="text-[#0460D9]">{selectedTicket.solicitante}</span>  •  {selectedTicket.fecha}  (FOLIO: {selectedTicket.id})
-                     </p>
+                {/* Header */}
+                <div className="mb-6 pb-6 border-b border-slate-100">
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <h2 className="text-xl font-bold text-slate-800">{selectedTicket.asunto}</h2>
+                    <StatusBadge status={selectedTicket.estado} />
                   </div>
-                  
-                  {/* Hilo de Conversación */}
-                  <div className="space-y-12">
-                     {/* Mensaje 1: El Solicitante */}
-                     <div className="flex gap-5">
-                        <div className="w-12 h-12 rounded-full bg-[#0460D9]/10 text-[#0460D9] flex items-center justify-center font-black flex-shrink-0 border border-[#0460D9]/20 shadow-sm relative z-10">
-                           <UserCircle size={22} />
-                        </div>
-                        <div className="flex-1">
-                           <div className="flex items-center justify-between mb-3 border-b border-transparent">
-                              <h4 className="text-[11px] font-black uppercase tracking-widest text-[#002855]">{selectedTicket.solicitante}</h4>
-                              <span className="text-[10px] font-bold text-slate-400">{selectedTicket.fecha}</span>
-                           </div>
-                           <p className="text-[13px] text-slate-700 leading-relaxed font-medium">
-                              {selectedTicket.descripcion}
-                           </p>
-                        </div>
-                     </div>
+                  <div className="flex items-center gap-4 text-sm text-slate-500">
+                    <div className="flex items-center gap-2">
+                      <Avatar name={selectedTicket.solicitante} size="sm" />
+                      <span className="font-medium text-slate-700">{selectedTicket.solicitante}</span>
+                    </div>
+                    <span>•</span>
+                    <span className="flex items-center gap-1">
+                      <Calendar size={14} />
+                      {selectedTicket.fecha}
+                    </span>
+                    <span>•</span>
+                    <span className="text-indigo-600 font-medium">Folio: {selectedTicket.id}</span>
+                  </div>
+                </div>
+                
+                {/* Timeline */}
+                <div className="space-y-6">
+                  {/* Request */}
+                  <div className="flex gap-4">
+                    <div className="h-12 w-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center flex-shrink-0">
+                      <User size={20} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-semibold text-slate-800">{selectedTicket.solicitante}</h4>
+                        <span className="text-xs text-slate-400">{selectedTicket.fecha}</span>
+                      </div>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        {selectedTicket.descripcion}
+                      </p>
+                    </div>
+                  </div>
 
-                     {/* Mensaje 2: La Dependencia (Sólo si está Atendido u hay respuesta) */}
-                     {selectedTicket.respuesta && (
-                     <div className="flex gap-5 relative">
-                        {/* Línea conectora */}
-                        <div className="absolute -top-12 left-6 w-px h-12 bg-slate-200 -z-10"></div>
-                        
-                        <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-black flex-shrink-0 border border-emerald-100 shadow-sm relative z-10">
-                           <ShieldCheck size={22} />
+                  {/* Response */}
+                  {selectedTicket.respuesta && (
+                    <div className="flex gap-4">
+                      <div className="h-12 w-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                        <ShieldCheck size={20} />
+                      </div>
+                      <div className="flex-1 bg-emerald-50/50 p-5 rounded-xl border border-emerald-100">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-sm font-semibold text-slate-800">{selectedTicket.dependencia}</h4>
+                            <Badge variant="success" size="sm">✓ Respuesta Institucional</Badge>
+                          </div>
+                          <span className="text-xs text-slate-400">{selectedTicket.fechaRespuesta}</span>
                         </div>
-                        <div className="flex-1 bg-emerald-50/50 p-6 rounded-lg border border-emerald-100">
-                           <div className="flex items-center justify-between mb-3">
-                              <h4 className="text-[11px] font-black uppercase tracking-widest text-[#002855]">
-                                 {selectedTicket.dependencia} 
-                                 <span className="text-emerald-500 ml-2 italic hidden md:inline">✓ Respuesta Institucional</span>
-                              </h4>
-                              <span className="text-[10px] font-bold text-slate-400">{selectedTicket.fechaRespuesta}</span>
-                           </div>
-                           <p className="text-[13px] text-slate-700 leading-relaxed font-medium">
-                              {selectedTicket.respuesta}
-                           </p>
-                        </div>
-                     </div>
-                     )}
-                  </div>
+                        <p className="text-sm text-slate-600 leading-relaxed">
+                          {selectedTicket.respuesta}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="mt-8 pt-6 border-t border-slate-100 flex gap-3">
+                  <Button variant="outline" size="sm">
+                    <FileText size={16} />
+                    Ver historial completo
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    <ShieldCheck size={16} />
+                    Auditoría SGC
+                  </Button>
+                </div>
               </div>
-           ) : (
-              <div className="m-auto text-center">
-                  <div className="w-20 h-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                     <ClipboardCheck size={36} />
-                  </div>
-                  <p className="text-[14px] font-black text-slate-400 uppercase tracking-widest">Trazabilidad SGC</p>
-                  <p className="text-[11px] font-medium text-slate-400 mt-2 max-w-sm mx-auto">Selecciona un requerimiento de la lista lateral para auditar el historial e intercambio de respuestas institucionales.</p>
+            ) : (
+              <div className="m-auto text-center py-12">
+                <div className="h-16 w-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ClipboardCheck size={32} />
+                </div>
+                <p className="text-lg font-semibold text-slate-600 mb-2">Trazabilidad SGC</p>
+                <p className="text-sm text-slate-400 max-w-sm mx-auto">Seleccione un requerimiento de la lista para auditar el historial e intercambio de respuestas.</p>
               </div>
-           )}
+            )}
+          </div>
         </div>
-
-      </div>
+      </Card>
     </div>
   )
 }

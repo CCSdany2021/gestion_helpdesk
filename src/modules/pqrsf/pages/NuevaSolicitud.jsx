@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, Input, Button, Badge, cn } from '@/components/ui'
+import { Card, Input, Button, Badge } from '@/components/ui'
 import { 
   Send, 
   Upload, 
@@ -10,12 +10,14 @@ import {
   MessageSquare, 
   CheckCircle2, 
   ArrowRight,
-  Info
+  ArrowLeft,
+  User,
+  Building2
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const pqrsfTypes = [
-  { id: 'P', label: 'Petición', icon: HelpCircle, color: 'bg-blue-500', description: 'Solicitud formal de información o servicios.' },
+  { id: 'P', label: 'Petición', icon: HelpCircle, color: 'bg-indigo-500', description: 'Solicitud formal de información o servicios.' },
   { id: 'Q', label: 'Queja', icon: AlertTriangle, color: 'bg-red-500', description: 'Manifestación de inconformidad por una situación.' },
   { id: 'R', label: 'Reclamo', icon: FileText, color: 'bg-orange-500', description: 'Exigencia por la prestación deficiente de un servicio.' },
   { id: 'S', label: 'Sugerencia', icon: MessageSquare, color: 'bg-emerald-500', description: 'Idea para mejorar la prestación del servicio.' },
@@ -49,57 +51,61 @@ const NuevaSolicitud = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    console.log('Enviando:', formData, files)
     setStep(3)
   }
 
+  const selectedType = pqrsfTypes.find(t => t.id === formData.tipo)
+
   return (
-    <div className="w-full py-2">
-      {/* Stepper Superior */}
-      <div className="flex items-center justify-between mb-12 px-12 relative">
-        <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-slate-200 -z-0"></div>
+    <div className="space-y-6">
+      {/* Step Indicator */}
+      <div className="flex items-center justify-center gap-4">
         {[1, 2, 3].map((s) => (
-          <div key={s} className="flex flex-col items-center gap-2 relative z-10 bg-app-bg px-4">
-            <div className={`
-              h-8 w-8 flex items-center justify-center font-black text-[10px] transition-all duration-500
-              ${step === s ? 'bg-primary text-white shadow-xl shadow-primary/20 scale-125' : step > s ? 'bg-primary-dark text-white' : 'bg-white border border-slate-200 text-slate-300'}
-            `}>
-              {step > s ? <CheckCircle2 size={16} /> : s}
+          <div key={s} className="flex items-center gap-2">
+            <div className={`h-10 w-10 rounded-full flex items-center justify-center font-semibold ${
+              step >= s ? 'bg-indigo-600 text-white' : 'bg-slate-200 text-slate-500'
+            }`}>
+              {step > s ? <CheckCircle2 size={20} /> : s}
             </div>
-            <span className={`text-[9px] font-black uppercase tracking-widest ${step === s ? 'text-primary' : 'text-slate-400'}`}>
-              {s === 1 ? 'Categoría' : s === 2 ? 'Información' : 'Finalizar'}
+            <span className={`text-sm font-medium ${step >= s ? 'text-slate-800' : 'text-slate-400'}`}>
+              {s === 1 ? 'Tipo' : s === 2 ? 'Detalles' : 'Confirmación'}
             </span>
+            {s < 3 && <div className={`w-12 h-0.5 ${step > s ? 'bg-indigo-600' : 'bg-slate-200'}`} />}
           </div>
         ))}
       </div>
 
       <AnimatePresence mode="wait">
         {step === 1 && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-6"
           >
-            {pqrsfTypes.map((type) => (
-              <Card 
-                key={type.id}
-                onClick={() => handleTypeSelect(type.id)}
-                className="p-8 cursor-pointer border border-slate-100 hover:border-primary transition-all group relative active:scale-[0.98]"
-              >
-                <div className={cn(
-                  "h-12 w-12 flex items-center justify-center text-white mb-6 transition-transform group-hover:scale-110 shadow-lg",
-                  type.id === 'P' ? 'bg-[#0460D9]' : type.id === 'Q' ? 'bg-red-600' : type.id === 'R' ? 'bg-orange-500' : type.id === 'S' ? 'bg-emerald-600' : 'bg-primary-dark'
-                )}>
-                  <type.icon size={24} />
-                </div>
-                <h3 className="font-black text-sm text-slate-900 uppercase tracking-widest">{type.label}</h3>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight leading-relaxed mt-2">{type.description}</p>
-                <div className="absolute bottom-6 right-6 text-slate-200 group-hover:text-primary transition-colors">
-                  <ArrowRight size={18} />
-                </div>
-              </Card>
-            ))}
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold text-slate-800">Seleccione el tipo de solicitud</h1>
+              <p className="text-slate-500 mt-2">Elija la categoría que mejor describe su necesidad</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              {pqrsfTypes.map((type) => (
+                <Card 
+                  key={type.id}
+                  className="p-6 cursor-pointer hover:shadow-lg hover:border-indigo-300 transition-all group text-center relative"
+                  onClick={() => handleTypeSelect(type)}
+                >
+                  <div className={`h-14 w-14 ${type.color} rounded-xl flex items-center justify-center text-white mx-auto mb-4 shadow-lg`}>
+                    <type.icon size={28} />
+                  </div>
+                  <h3 className="text-base font-semibold text-slate-800 mb-2">{type.label}</h3>
+                  <p className="text-sm text-slate-500 leading-relaxed">{type.description}</p>
+                  <div className="absolute top-4 right-4 text-slate-300 group-hover:text-indigo-600 transition-colors">
+                    <ArrowRight size={20} />
+                  </div>
+                </Card>
+              ))}
+            </div>
           </motion.div>
         )}
 
@@ -111,136 +117,186 @@ const NuevaSolicitud = () => {
             className="grid grid-cols-1 lg:grid-cols-3 gap-6"
           >
             <div className="lg:col-span-2">
-              <Card className="p-10 border-t-4 border-primary">
-                <div className="flex items-center gap-4 mb-10">
-                   <div className="h-10 w-10 bg-slate-50 text-primary border border-slate-100 flex items-center justify-center">
-                    <FileText size={20} />
-                   </div>
-                   <div>
-                     <h2 className="text-xl font-black text-primary tracking-tight">DATOS DEL RADICADO</h2>
-                     <Badge variant="info">TIPO SELECCIONADO: {pqrsfTypes.find(t => t.id === formData.tipo)?.label}</Badge>
-                   </div>
+              <Card className="p-6">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="h-12 w-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
+                    <FileText size={24} />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-800">Detalles de la Solicitud</h2>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="primary">{selectedType?.label}</Badge>
+                    </div>
+                  </div>
+                  <button onClick={() => setStep(1)} className="ml-auto text-slate-400 hover:text-slate-600">
+                    <ArrowLeft size={20} />
+                  </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <Input 
-                    label="Asunto de la solicitud" 
-                    placeholder="ESCRIBA EL ASUNTO AQUÍ..." 
+                    label="Asunto" 
+                    placeholder="Breve descripción del tema"
                     value={formData.asunto}
-                    onChange={(e) => setFormData({...formData, asunto: e.target.value.toUpperCase()})}
+                    onChange={(e) => setFormData({...formData, asunto: e.target.value})}
                     required
                   />
                   
                   <div className="space-y-2">
-                    <label className="subtitle-premium block">Descripción Detallada</label>
+                    <label className="block text-sm font-medium text-slate-700">Descripción detallada</label>
                     <textarea 
-                      className="input-field min-h-[150px] resize-none"
-                      placeholder="DETALLE LOS HECHOS CON CLARIDAD..."
+                      className="input-field min-h-[140px] resize-none"
+                      placeholder="Describa los hechos con claridad..."
                       value={formData.descripcion}
                       onChange={(e) => setFormData({...formData, descripcion: e.target.value})}
                       required
                     ></textarea>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                     <div className="space-y-2">
-                       <label className="subtitle-premium block">Dependencia Destino</label>
-                       <select 
-                        className="input-field uppercase font-bold text-[11px] tracking-widest cursor-pointer"
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-slate-700">Dependencia</label>
+                      <select 
+                        className="input-field"
                         value={formData.dependencia}
                         onChange={(e) => setFormData({...formData, dependencia: e.target.value})}
-                       >
-                         <option value="">-- SELECCIONAR ÁREA --</option>
-                         <option value="acad">SECCIÓN JARDÍN - TERCERO</option>
-                         <option value="acad">SECCIÓN CUARTO - SÉPTIMO</option>
-                         <option value="acad">SECCIÓN OCTAVO - UNDÉCIMO</option>
-                         <option value="fin">TESORERÍA / FINANCIERA</option>
-                         <option value="sist">SISTEMAS / IT</option>
-                         <option value="admin">DIRECCIÓN ADMINISTRATIVA</option>
-                         <option value="rect">RECTORÍA / SECRETARÍA</option>
-                       </select>
-                     </div>
-                     <Input 
-                        label="Nombre Completo del Afectado" 
-                        placeholder="NOMBRE Y APELLIDO..." 
-                        value={formData.afectado}
-                        onChange={(e) => setFormData({...formData, afectado: e.target.value.toUpperCase()})}
-                     />
+                      >
+                        <option value="">Seleccionar...</option>
+                        <option value="acad">Sección Jardín - Tercero</option>
+                        <option value="acad">Sección Cuarto - Séptimo</option>
+                        <option value="acad">Sección Octavo - Undécimo</option>
+                        <option value="fin">Tesorería</option>
+                        <option value="sist">Sistemas / IT</option>
+                        <option value="admin">Dirección Administrativa</option>
+                        <option value="rect">Rectoría / Secretaría</option>
+                      </select>
+                    </div>
+                    <Input 
+                      label="Nombre del afectado (opcional)" 
+                      placeholder="Nombre completo"
+                      value={formData.afectado}
+                      onChange={(e) => setFormData({...formData, afectado: e.target.value})}
+                    />
                   </div>
 
-                  <div className="pt-8 flex items-center justify-between border-t border-slate-100">
-                    <Button variant="outline" type="button" onClick={() => setStep(1)} size="md">
-                      VOLVER
+                  {/* File Upload */}
+                  <div className="space-y-3">
+                    <label className="block text-sm font-medium text-slate-700">Adjuntos (opcional)</label>
+                    <label className="flex items-center justify-center gap-2 p-6 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 hover:bg-indigo-50/50 transition-all">
+                      <Upload size={24} className="text-slate-400" />
+                      <span className="text-slate-500">Haga clic para adjuntar archivos</span>
+                      <input type="file" multiple className="hidden" onChange={handleFileChange} />
+                    </label>
+                    {files.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {files.map((file, idx) => (
+                          <div key={idx} className="flex items-center gap-2 px-3 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-sm">
+                            <FileText size={16} />
+                            <span>{file.name}</span>
+                            <button type="button" onClick={() => removeFile(idx)} className="hover:text-indigo-900">
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setStep(1)}>
+                      <ArrowLeft size={18} />
+                      Volver
                     </Button>
-                    <Button type="submit" size="lg" className="px-12">
-                      RADICAR PROCESO <Send size={16} className="ml-2" />
+                    <Button type="submit" className="ml-auto">
+                      <Send size={18} />
+                      Radicar Solicitud
                     </Button>
                   </div>
                 </form>
               </Card>
             </div>
 
-            <div className="space-y-6">
-              <Card className="p-8 bg-[#002855] text-white border-none shadow-2xl relative overflow-hidden">
-                <div className="relative z-10">
-                  <h4 className="text-[11px] font-black uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                    <Upload size={16} className="text-accent" /> Evidencias
-                  </h4>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase mb-6 leading-relaxed">PDF, JPG, PNG (MÁX 10MB)</p>
-                  
-                  <label className="block border-2 border-dashed border-slate-700 p-8 text-center hover:bg-[#003875] transition-all cursor-pointer group">
-                    <input type="file" multiple className="hidden" onChange={handleFileChange} />
-                    <HelpCircle className="mx-auto text-slate-600 group-hover:text-accent mb-3 transition-colors" size={32} />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Cargar Archivo</span>
-                  </label>
-
-                  <div className="mt-6 space-y-2">
-                    {files.map((file, i) => (
-                      <div key={i} className="flex items-center justify-between bg-black/20 p-3 text-[9px] font-black uppercase tracking-widest">
-                        <span className="truncate max-w-[140px]">{file.name}</span>
-                        <button onClick={() => removeFile(i)} className="text-red-400 hover:text-white">
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ))}
+            {/* Summary Sidebar */}
+            <div className="space-y-4">
+              <Card className="p-6">
+                <h3 className="font-semibold text-slate-800 mb-4">Resumen</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
+                      <FileText size={18} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Tipo</p>
+                      <p className="text-sm font-semibold text-slate-800">{selectedType?.label}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center">
+                      <Building2 size={18} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Dependencia</p>
+                      <p className="text-sm font-semibold text-slate-800">{formData.dependencia || 'Sin asignar'}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 bg-slate-100 text-slate-600 rounded-lg flex items-center justify-center">
+                      <Upload size={18} />
+                    </div>
+                    <div>
+                      <p className="text-xs text-slate-500">Adjuntos</p>
+                      <p className="text-sm font-semibold text-slate-800">{files.length} archivos</p>
+                    </div>
                   </div>
                 </div>
               </Card>
 
-              <div className="bg-amber-50 border border-amber-100 p-6 flex gap-4 text-amber-800">
-                <Info size={24} className="flex-shrink-0" />
-                <div className="text-[10px] uppercase font-bold tracking-tight">
-                   <p className="font-black text-amber-900 mb-1">IMPORTANTE:</p>
-                   <p className="opacity-80 leading-relaxed">La radicación es un proceso formal. El tiempo legal de respuesta es de 15 días hábiles.</p>
+              <Card className="p-6 bg-indigo-50 border-indigo-100">
+                <div className="flex items-start gap-3">
+                  <div className="h-10 w-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <HelpCircle size={18} />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-800 mb-1">¿Necesita ayuda?</h4>
+                    <p className="text-sm text-slate-600">Si tiene dudas sobre el proceso, puede contactarnos por los canales oficiales.</p>
+                  </div>
                 </div>
-              </div>
+              </Card>
             </div>
           </motion.div>
         )}
 
         {step === 3 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center justify-center py-20 text-center"
+            className="flex items-center justify-center py-12"
           >
-            <div className="h-28 w-28 bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mb-8 shadow-2xl shadow-emerald-500/10">
-              <CheckCircle2 size={56} />
-            </div>
-            <h1 className="text-3xl font-black text-[#0460D9] tracking-tighter uppercase">¡Trámite Radicado!</h1>
-            <p className="subtitle-premium !text-emerald-600 mt-2">FOLIO ASIGNADO: #PQRSF-2026-0042</p>
-            <p className="text-slate-400 max-w-sm mt-6 text-[11px] font-bold uppercase tracking-tight leading-relaxed">
-              SU SOLICITUD HA ENTRADO EN FASE DE REVISIÓN TÉCNICA. RECIBIRÁ UNA NOTIFICACIÓN EN SU CORREO INSTITUCIONAL.
-            </p>
-            
-            <div className="mt-12 flex gap-4">
-               <Button variant="outline" onClick={() => navigate('/pqrsf/mis-solicitudes')} size="lg">
-                 VER SEGUIMIENTO
-               </Button>
-               <Button onClick={() => setStep(1)} size="lg" className="px-10">
-                 NUEVO TRÁMITE
-               </Button>
-            </div>
+            <Card className="p-12 text-center max-w-md">
+              <div className="h-20 w-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 size={40} />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-800 mb-2">Solicitud Radicada</h2>
+              <p className="text-slate-500 mb-6">Su solicitud ha sido creada exitosamente. Puede hacer seguimiento con el número de radicado.</p>
+              
+              <div className="bg-slate-50 rounded-xl p-4 mb-6">
+                <p className="text-xs text-slate-500 mb-1">Número de Radicado</p>
+                <p className="text-2xl font-bold text-indigo-600">PQRS-2026-0142</p>
+              </div>
+
+              <div className="flex gap-4 justify-center">
+                <Button variant="outline" onClick={() => {
+                  setStep(1)
+                  setFormData({ tipo: '', asunto: '', descripcion: '', afectado: '', dependencia: '' })
+                  setFiles([])
+                }}>
+                  Nueva Solicitud
+                </Button>
+                <Button onClick={() => window.location.href = '/pqrsf/mis-solicitudes'}>
+                  Ver mis solicitudes
+                </Button>
+              </div>
+            </Card>
           </motion.div>
         )}
       </AnimatePresence>
